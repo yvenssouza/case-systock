@@ -128,5 +128,20 @@ Na validação entre compras e entradas, foi adotada a interpretação de que qt
 <img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/ab8911ca-338e-4d52-8653-9c1e1ad85c35" />
 
 
+Ajustes e correções realizados durante o processo
+
+Além das correções estruturais já documentadas no schema, também foram observados ajustes de importação e compatibilização de layout, como:
+
+uso de tabelas de staging para evitar perda de dados durante a carga;
+
+adequação de nomes de colunas entre planilha e banco;
+
+tratamento de valores nulos ou ausentes em colunas numéricas;
+
+revisão do relacionamento entre pedidos e entradas de mercadoria com base na regra do case;
+
+identificação de inconsistências intencionais na base, usadas como parte da análise do processo de integração.
+
+
 
 
