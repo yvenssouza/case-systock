@@ -144,4 +144,53 @@ identificação de inconsistências intencionais na base, usadas como parte da a
 
 
 
+## Parte 2 – Consultas SQL Básicas
+
+### 1. Consumo por produto no mês de fevereiro de 2025
+
+SELECT
+    v.produto_id,
+    SUM(v.qtde_vendida) AS total_qtde_vendida,
+    SUM(v.qtde_vendida * v.valor_unitario) AS total_valor_vendido
+FROM public.venda v
+WHERE v.data_emissao >= DATE '2025-02-01'
+  AND v.data_emissao < DATE '2025-03-01'
+GROUP BY v.produto_id
+ORDER BY v.produto_id;
+
+A consulta agrupa as vendas por produto e calcula, para o mês de fevereiro de 2025, o total vendido em quantidade e o valor total vendido em reais.
+
+### 2.Produtos com requisição pendente
+
+SELECT
+    pc.ordem_compra,
+    pc.item,
+    pc.produto_id,
+    pc.descricao_produto,
+    pc.qtde_pedida,
+    COALESCE(SUM(em.qtde_recebida), 0) AS qtde_recebida,
+    pc.qtde_pedida - COALESCE(SUM(em.qtde_recebida), 0) AS qtde_pendente
+FROM public.pedido_compra pc
+LEFT JOIN public.entradas_mercadoria em
+       ON em.ordem_compra = pc.ordem_compra
+      AND em.produto_id = pc.produto_id
+      AND em.item = pc.item
+GROUP BY
+    pc.ordem_compra,
+    pc.item,
+    pc.produto_id,
+    pc.descricao_produto,
+    pc.qtde_pedida
+HAVING pc.qtde_pedida > COALESCE(SUM(em.qtde_recebida), 0)
+ORDER BY pc.ordem_compra, pc.item, pc.produto_id;
+
+
+A consulta relaciona pedidos de compra e entradas de mercadoria por ordem de compra, item e produto, retornando os casos em que a quantidade recebida foi menor do que a quantidade pedida.
+
+
+
+
+
+
+
 
