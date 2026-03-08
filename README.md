@@ -56,3 +56,13 @@ As tabelas criadas foram:
 * fornecedor
 
 
+
+3.
+Para validação dos dados de compras, foi considerado o relacionamento entre as tabelas pedido_compra e entradas_mercadoria por meio do campo ordem_compra, conforme instrução do case. A interpretação adotada foi a de que qtde_pedida representa a quantidade solicitada ao fornecedor e qtde_recebida representa a quantidade efetivamente recebida na entrada de mercadoria vinculada ao pedido. A partir desse cruzamento, foi possível identificar pedidos atendidos integralmente, parcialmente e casos com possíveis inconsistências de relacionamento ou de dados.
+
+
+<img width="1015" height="810" alt="image" src="https://github.com/user-attachments/assets/ab8911ca-338e-4d52-8653-9c1e1ad85c35" />
+
+
+
+
