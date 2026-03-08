@@ -189,6 +189,93 @@ A consulta relaciona pedidos de compra e entradas de mercadoria por ordem de com
 
 
 
+Parte 3 – Transformações de Dados
+
+Nesta etapa, foram criadas consultas SQL para transformação e apresentação dos dados da tabela `pedido_compra`, além de uma trigger para geração automática de fornecedor na tabela `produtos_filial`.
+
+### 1. Concatenação de `produto_id` e `descricao_produto`
+
+
+SELECT
+    pc.produto_id || ' - ' || pc.descricao_produto AS "Produto"
+FROM public.pedido_compra pc;
+
+
+consulta concatena o código e a descrição do produto no formato solicitado pelo case, por exemplo: P1 - Produto 1.
+
+2. Formatação da data para DD/MM/YYYY
+SELECT
+    to_char(pc.data_pedido, 'DD/MM/YYYY') AS "Data Solicitação"
+FROM public.pedido_compra pc;
+
+A consulta utiliza a função to_char() para exibir a data no padrão brasileiro DD/MM/YYYY.
+
+3. Filtro de produtos requisitados com quantidade maior que 10
+SELECT
+    pc.produto_id || ' - ' || pc.descricao_produto AS "Produto",
+    pc.qtde_pedida AS "Qtde Requisitada",
+    to_char(pc.data_pedido, 'DD/MM/YYYY') AS "Data Solicitação"
+FROM public.pedido_compra pc
+WHERE pc.qtde_pedida > 10
+ORDER BY pc.produto_id, pc.data_pedido;
+
+Foi adotada a interpretação de produtos com qtde_pedida > 10, pois essa leitura se mostrou mais aderente ao exemplo apresentado no enunciado. A consulta retorna o produto formatado, a quantidade requisitada e a data de solicitação.
+
+4. Trigger para geração automática de idfornecedor
+Sequence
+CREATE SEQUENCE seq_idfornecedor
+START 21
+INCREMENT 1;
+Função da trigger
+CREATE OR REPLACE FUNCTION fn_gerar_fornecedor_produto()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    novo_id int;
+BEGIN
+    IF NEW.idfornecedor IS NULL THEN
+        novo_id := nextval('seq_idfornecedor');
+        NEW.idfornecedor := novo_id;
+
+        INSERT INTO public.fornecedor (idfornecedor, razao_social)
+        VALUES ('F' || novo_id, 'FORNECEDOR AUTO ' || novo_id);
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+Trigger
+CREATE TRIGGER trg_gerar_fornecedor_produto
+BEFORE INSERT ON public.produtos_filial
+FOR EACH ROW
+EXECUTE FUNCTION fn_gerar_fornecedor_produto();
+Teste de execução
+INSERT INTO public.produtos_filial (
+    filial_id,
+    produto_id,
+    descricao,
+    estoque,
+    preco_unitario,
+    preco_compra,
+    preco_venda,
+    idfornecedor
+)
+VALUES (
+    1,
+    'P999',
+    'Produto Teste',
+    10,
+    50,
+    30,
+    70,
+    NULL
+);
+
+A trigger foi criada para preencher automaticamente o campo idfornecedor ao inserir um novo produto sem fornecedor informado. Além disso, a função também cria o registro correspondente na tabela fornecedor, mantendo o relacionamento entre as tabelas.
+
+
+
 
 
 
